@@ -1,4 +1,5 @@
 from frota import *
+import pickle
 
 def operar_carro(carro: Carro):
     print('1- Ligar motor')
@@ -20,29 +21,58 @@ def operar_carro(carro: Carro):
 
 if __name__ == "__main__":
 
-    kms = 0
-
-    print('Cadastre o 1º carro')
-    nm_modelo = input('Digite o modelo: ')
-    nm_marca = input('Digite a marca: ')
-    nm_cor = input('Digite a cor: ')
-
-    #kms = float(input('Digite com quantos Kms: '))
+    carros = {}
+    try:
+        with open('carros.pkl', 'rb') as arquivo:
+            carros = pickle.load(arquivo)
+    except Exception as e:
+        print('Ainda não existem carros!')
 
 
-    carro1 = Carro(nm_modelo, nm_marca, nm_cor, kms, motor = False)
+    if (len(carros) == 0):
+        kms = 0
 
-    print('Cadastre o 2º carro')
-    nm_modelo = input('Digite o modelo: ')
-    nm_marca = input('Digite a marca: ')
-    nm_cor = input('Digite a cor: ')
-    carro2 = Carro(nm_modelo, nm_marca, nm_cor, kms, motor=False)
+        print('Cadastre o 1º carro')
+        nm_modelo = input('Digite o modelo: ')
+        nm_marca = input('Digite a marca: ')
+        nm_cor = input('Digite a cor: ')
+        nm_tanque = int(input('Quantos litros tem no tanque: '))
+        nm_consumo = int(input('Qual o consumo medio: '))
+
+        #kms = float(input('Digite com quantos Kms: '))
+
+
+        carro1 = Carro(nm_modelo, nm_marca, nm_cor, kms, False, nm_tanque, nm_consumo)
+
+        print('Cadastre o 2º carro')
+        nm_modelo = input('Digite o modelo: ')
+        nm_marca = input('Digite a marca: ')
+        nm_cor = input('Digite a cor: ')
+        nm_tanque = int(input('Quantos litros tem no tanque: '))
+        nm_consumo = int(input('Qual o consumo medio: '))
+
+        carro2 = Carro(nm_modelo, nm_marca, nm_cor, kms, False, nm_tanque, nm_consumo)
+
+
+        carros[id(carro1)] = carro1
+        carros[id(carro2)] = carro2
+
+        try:
+            with open('carros.pkl', 'wb') as arquivo:
+                pickle.dump(carros, arquivo)
+        except Exception as e:
+            print(e)
+    else:
+        valores = list(carros.values())
+        carro1 = valores[0]
+        carro2 = valores[1]
 
     '''
     Controlando o carro até ele atingir 10000 Km
     '''
-    while carro1.odometro < 600 and carro2.odometro < 600:
+    while carro1.getOdometro() < 600 and carro2.getOdometro()< 600:
         try:
+
             op = 0
             while op not in (1, 2, 3):
                 op = int(input('Qual carro? [1-2] '))
@@ -56,11 +86,13 @@ if __name__ == "__main__":
             print("Erro!")
             print(e)
 
-    if carro1.motor_on == True:
+    if carro1.getMotor() == True:
         carro1.desligar()
-    if carro2.motor_on == True:
+    if carro2.getMotor() == True:
         carro2.desligar()
+
+
     print(carro1)
     print(carro2)
 
-    print("O carro" + ('1' if carro1.odometro >= 600 else '2') + ' chegou ao destino primeiro')
+    print("O carro" + ('1' if carro1.getOdometro() >= 600 else '2') + ' chegou ao destino primeiro')
